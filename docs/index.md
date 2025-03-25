@@ -20,7 +20,7 @@ Issac Lab在计算巢上的费用主要涉及：
 
 预估费用在创建实例时可实时看到。
 
-## 部署架构
+## 服务架构
 
 ![img.png](img.png)
 
@@ -72,7 +72,8 @@ Isaac Lab服务需要对ECS、VPC等资源进行访问和创建操作，若您�
 服务实例部署好以后，怎么进行使用呢，可以参考下面的使用教程，这里有两种方式可以使用我们部署好的Isaac Lab服务。
 ### 使用方式一：通过Omniverse Streaming Client远程连接使用
 Isaac Lab服务在启动时会自动启动Isaac Sim，您可以通过Omniverse Streaming Client远程连接Isaac Sim，使用图形界面快速开发和调试机器人。
-#### 下载安装Omniverse Streaming Client
+#### 第一步：下载安装Omniverse Streaming Client
+
 1. Omniverse Streaming Client安装需要准备一台带GPU的Windows系统电脑，并需要安装GPU Grid驱动。
 ```
 如果您当前没有Windows系统的带GPU的PC，您可以通过阿里云无影服务购买一台带GPU的Windows系统电脑，
@@ -87,7 +88,8 @@ Isaac Lab服务在启动时会自动启动Isaac Sim，您可以通过Omniverse S
 ![img_8.png](img_8.png)
 ![img_9.png](img_9.png)
 
-#### Client连接Isaac Sim, 进行图形化开发和调试
+#### 第二步：Client连接Isaac Sim, 进行图形化开发和调试
+
 1. Omniverse Streaming Client打开连接界面后，在Server里输入Isaac Lab服务实例的IP地址，点击Connect即可连接Isaac Sim。
 
 ![img_10.png](img_10.png)
