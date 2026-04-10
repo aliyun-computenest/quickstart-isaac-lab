@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="计算巢是阿里云开放给企业应用服务商的服务管理平台。服务商能够在计算巢上发布私有化部署服务，为其客户提供云上软件一键部署的能力；同时也支持全托管模式的服务，赋能服务商托管其客户资源。">
+  <title>Isaac Lab Ray集群版部署文档 - Aliyun 计算巢 x Demo</title>
+
+  <link rel="shortcut icon" href="../img/favicon.ico">
+
+  <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css">
+  <link rel="stylesheet" href="../css/theme.css">
+  
+
+  
+
+  
+  
+
+  
+    <script src="../search/main.js"></script>
+  
+
+  
+
+  <script src="../js/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</head>
+
+<body>
+  <div class="container">
+    <div class="nav">
+      <div class="nav-inner">
+        <div class="logo">
+          <img src="./img/logo-2x.png">
+        </div>
+        <div class="nav-list">
+          <ul>
+          
+              <li><a href="#isaac-lab-ray">Isaac Lab Ray集群版部署文档</a></li>
+              
+                  <li><a href="#_1">概述</a></li>
+                  
+              
+                  <li><a href="#_2">计费说明</a></li>
+                  
+              
+                  <li><a href="#_3">服务架构</a></li>
+                  
+              
+                  <li><a href="#ram">RAM账号所需权限</a></li>
+                  
+              
+                  <li><a href="#_4">部署流程</a></li>
+                  
+                      <li class="li-h3"><a href="#_5">部署步骤</a></li>
+                  
+              
+                  <li><a href="#_9">使用教程</a></li>
+                  
+                      <li class="li-h3"><a href="#_10">环境准备</a></li>
+                  
+                      <li class="li-h3"><a href="#job">在日志中打印执行结果的测试job</a></li>
+                  
+                      <li class="li-h3"><a href="#isaac-lab">执行Isaac Lab训练任务</a></li>
+                  
+              
+          
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="content theme-github">
+      
+      <div class="content-inner">        
+        
+        <h1 id="isaac-lab-ray">Isaac Lab Ray集群版部署文档</h1>
+<h2 id="_1">概述</h2>
+<p>Isaac Lab 建立在 Isaac Sim 之上，利用最新的仿真技术提供了一个统一且灵活的机器人学习框架。它设计为模块化和可扩展的，旨在简化机器人研究中的常见工作流（例如强化学习、示范学习和运动规划）。虽然它包含一些预构建的环境、传感器和任务，但其主要目标是提供一个开源、统一且易于使用的接口，用于开发和测试自定义环境和机器人学习算法。</p>
+<h2 id="_2">计费说明</h2>
+<p>Issac Lab在计算巢上的费用主要涉及：</p>
+<ul>
+<li>所选vCPU、GPU与内存规格</li>
+<li>系统盘类型及容量</li>
+<li>公网带宽</li>
+<li>ack集群费用</li>
+</ul>
+<p>计费方式包括：</p>
+<ul>
+<li>按量付费（小时）</li>
+<li>包年包月</li>
+</ul>
+<p>预估费用在创建实例时可实时看到。</p>
+<h2 id="_3">服务架构</h2>
+<p><img alt="img.png" src="img.png" /></p>
+<h2 id="ram">RAM账号所需权限</h2>
+<p>Isaac Lab服务需要对ECS、VPC、容器集群等资源进行访问和创建操作，若您使用RAM用户创建服务实例，需要在创建服务实例前，对使用的RAM用户的账号添加相应资源的权限。添加RAM权限的详细操作，请参见<a href="https://help.aliyun.com/document_detail/121945.html">为RAM用户授权</a>。所需权限如下表所示。</p>
+<table>
+<thead>
+<tr>
+<th>权限策略名称</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AliyunECSFullAccess</td>
+<td>管理云服务器服务（ECS）的权限</td>
+</tr>
+<tr>
+<td>AliyunVPCFullAccess</td>
+<td>管理专有网络（VPC）的权限</td>
+</tr>
+<tr>
+<td>AliyunROSFullAccess</td>
+<td>管理资源编排服务（ROS）的权限</td>
+</tr>
+<tr>
+<td>AliyunComputeNestUserFullAccess</td>
+<td>管理计算巢服务（ComputeNest）的用户侧权限</td>
+</tr>
+<tr>
+<td>AliyunCloudMonitorFullAccess</td>
+<td>管理云监控（CloudMonitor）的权限</td>
+</tr>
+<tr>
+<td>AliyunCSFullAccess</td>
+<td>管理容器服务(CS)的权限</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_4">部署流程</h2>
+<h3 id="_5">部署步骤</h3>
+<h4 id="_6">第一步：选择配置</h4>
+<ol>
+<li>选择模版，这里选择Ray集群版</li>
+</ol>
+<p><img alt="img_1.png" src="img_1.png" /></p>
+<ol>
+<li>服务实例名称，可以自定义，也可以使用默认 </li>
+<li>地域，建议就近选中，以获取更好的网络延时 </li>
+<li>付费类型，选择按量付费或包年包月 </li>
+<li>Kubernetes配置，选择合适的Worker节点实例规格, 设置实例节点数，选择ack网络插件，有flannel和terway两种可选。</li>
+</ol>
+<p><img alt="img_2.png" src="img_2.png" /></p>
+<ol>
+<li>可用区配置里，可以选择地域下对应的可用区，选择已有或新建VPC网络</li>
+</ol>
+<p><img alt="img_3.png" src="img_3.png" /></p>
+<ol>
+<li>设置Ray Worker配置，这里可以设置Worker节点数和每个Worker的GPU、CPU和内存数，需要注意的是，这里Worker节点
+所需资源的总和，需要小于集群节点配置的总和，并且要预留出head节点8核8G的内存，以及k8s控制面组件的相关资源。</li>
+</ol>
+<p><img alt="img_4.png" src="img_4.png" /></p>
+<h4 id="_7">第二步：创建服务实例</h4>
+<ol>
+<li>选择完服务需要的配置后，点击立即创建，既可以进行服务实例创建。</li>
+</ol>
+<p><img alt="img_5.png" src="img_5.png" /></p>
+<ol>
+<li>服务实例创建发起后，会进入到服务实例列表页面，这里可以看到服务实例的部署进度。</li>
+</ol>
+<p><img alt="img_7.png" src="img_7.png" /></p>
+<h4 id="_8">第三步：查看实例详情</h4>
+<ol>
+<li>当服务实例状态变成"已部署"，点击服务实例名称，进入到对应的服务实例详情页面。</li>
+</ol>
+<p><img alt="img_6.png" src="img_6.png" />
+2. 服务实例详情"立即使用"模块中，可以看到ray集群的url，后面配置会使用，具体使用方式参见上面的服务部署和使用说明。</p>
+<p><img alt="img_8.png" src="img_8.png" /></p>
+<h2 id="_9">使用教程</h2>
+<p>Isaac Lab 支持 Ray ，用于简化多个训练任务的调度（包括并行和串行），以及超参数调优，适用于本地和远程配置。</p>
+<p>Isaac Lab服务Ray作业调度和调优官方文档为<a href="https://isaac-sim.github.io/IsaacLab/main/source/features/ray.html">Ray Job Dispatch and Tuning</a>。</p>
+<h3 id="_10">环境准备</h3>
+<ol>
+<li>在本地电脑配置远程Ray集群信息，具体命令如下：</li>
+</ol>
+<pre><code class="language-shell"># 这里的&lt;ISAACRAY_ADDRESS&gt;为ray集群的url，可以从服务实例概览页中获取
+echo &quot;name: isaacray address: &lt;ISAACRAY_ADDRESS&gt;&quot; &gt; ~/.cluster_config
+export RAY_ADDRESS=&quot;&lt;ISAACRAY_ADDRESS&gt;&quot;
+</code></pre>
+<ol>
+<li>从git上下载<a href="https://github.com/isaac-sim/IsaacLab">Isaac Lab源码</a>, 用来做后续的作业提交。</li>
+<li>在本地电脑安装ray客户端，命令如下：</li>
+</ol>
+<pre><code class="language-shell">pip install &quot;ray[default]&quot;
+</code></pre>
+<h3 id="job">在日志中打印执行结果的测试job</h3>
+<ol>
+<li>在Isaac Lab源码目录scripts/reinforcement_learning/ray下新建
+个测试用的python文件test.py，内容如下：</li>
+</ol>
+<pre><code class="language-python">import ray
+import os
+
+# 连接本地或者远程ray cluster
+ray.init()
+
+@ray.remote(num_cpus=1)
+class Counter:
+    def __init__(self):
+        self.name = &quot;test_counter&quot;
+        self.counter = 0
+
+    def increment(self):
+        self.counter += 1
+
+    def get_counter(self):
+        return &quot;{} got {}&quot;.format(self.name, self.counter)
+
+counter = Counter.remote()
+
+for _ in range(10):
+    counter.increment.remote()
+    print(ray.get(counter.get_counter.remote()))
+</code></pre>
+<ol>
+<li>在Isaac Lab源代码目录下，使用ray提交作业，具体命令如下：</li>
+</ol>
+<pre><code class="language-shell">python3 scripts/reinforcement_learning/ray/submit_job.py --aggregate_jobs wrap_resources.py --sub_jobs &quot;/workspace/isaaclab/isaaclab.sh -p test.py&quot;
+</code></pre>
+<ol>
+<li>提交成功后，可以从日志里看到以下信息：</li>
+<li>
+<p>提交作业时，会把scripts/reinforcement_learning/ray目录当作工作目录进行打包，上传到集群中，所以我们的test.py也会被上传。
+   <img alt="img_9.png" src="img_9.png" /></p>
+</li>
+<li>
+<p>job运行完成后，可以看到输出的运行信息：
+   <img alt="img_10.png" src="img_10.png" /></p>
+</li>
+</ol>
+<h3 id="isaac-lab">执行Isaac Lab训练任务</h3>
+<ol>
+<li>在Isaac Lab源代码目录下，执行命令提交作业，具体命令如下：</li>
+</ol>
+<pre><code class="language-shell">python3 scripts/reinforcement_learning/ray/submit_job.py --aggregate_jobs wrap_resources.py --sub_jobs &quot;/workspace/isaaclab/isaaclab.sh -p /workspace/isaaclab/scripts/reinforcement_learning/rsl_rl/train.py --task=Isaac-Ant-v0 --headless&quot;
+</code></pre>
+<ol>
+<li>提交成功后，可以看到日志里输出的信息，这里主要可以看到job在集群上的工作目录，本例上为_ray_pkg_18b3cac8e32d6f62。</li>
+</ol>
+<p><img alt="img_11.png" src="img_11.png" /></p>
+<ol>
+<li>点击ray集群url, 可以到集群的web ui中查看job运行情况。</li>
+</ol>
+<p><img alt="img_12.png" src="img_12.png" /></p>
+<ol>
+<li>点击正在运行的这个job，可以看到job的调度日志，本例是调度到了c9db26a6c016fb4394991190f132afe99cd4a2b0a696f14185001650节点，
+对应的训练结果也要到这个节点上查看。</li>
+</ol>
+<p><img alt="img_13.png" src="img_13.png" /></p>
+<ol>
+<li>切到Cluster Tab下，输入node id进行搜索，可以找到容器集群中对应的Pod。</li>
+</ol>
+<p><img alt="img_14.png" src="img_14.png" /></p>
+<ol>
+<li>从服务实例资源中找到对应的容器集群，去容器集群中找到上面对应的Pod，并登录到Pod中。</li>
+</ol>
+<p><img alt="img_15.png" src="img_15.png" /></p>
+<ol>
+<li>登录到Pod中，可以看到训练结果，本例训练的Ant环境，训练的结果保存在下面的临时目录中：</li>
+</ol>
+<pre><code class="language-shell"># 执行job的临时目录，其中_ray_pkg_18b3cac8e32d6f62取决于上传文件的目录，2025-08-21_08-08-24 是具体运行时间
+cd /tmp/ray/session_latest/runtime_resources/working_dir_files/_ray_pkg_18b3cac8e32d6f62/logs/rsl_rl/ant/2025-08-21_08-08-24 
+</code></pre>
+<p><img alt="img_17.png" src="img_17.png" /></p>
+        
+      </div>
+
+      <div class="copyrights">© 2009-2022 Aliyun.com 版权所有</div>
+    </div>
+  </div>
+  
+  <!--
+  MkDocs version      : 1.6.1
+  Docs Build Date UTC : 2026-04-10 07:57:25.214008+00:00
+  -->
+</body>
+</html>

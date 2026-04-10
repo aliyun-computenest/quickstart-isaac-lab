@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="计算巢是阿里云开放给企业应用服务商的服务管理平台。服务商能够在计算巢上发布私有化部署服务，为其客户提供云上软件一键部署的能力；同时也支持全托管模式的服务，赋能服务商托管其客户资源。">
+  <title>Isaac Lab standalone deployment documentation - Aliyun 计算巢 x Demo</title>
+
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+
+  <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css">
+  <link rel="stylesheet" href="../../css/theme.css">
+  
+
+  
+
+  
+  
+
+  
+    <script src="../../search/main.js"></script>
+  
+
+  
+
+  <script src="../../js/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</head>
+
+<body>
+  <div class="container">
+    <div class="nav">
+      <div class="nav-inner">
+        <div class="logo">
+          <img src="./img/logo-2x.png">
+        </div>
+        <div class="nav-list">
+          <ul>
+          
+              <li><a href="#isaac-lab-standalone-deployment-documentation">Isaac Lab standalone deployment documentation</a></li>
+              
+                  <li><a href="#overview">Overview</a></li>
+                  
+              
+                  <li><a href="#billing-description">Billing Description</a></li>
+                  
+              
+                  <li><a href="#service-architecture">Service Architecture</a></li>
+                  
+              
+                  <li><a href="#permissions-required-for-ram-accounts">Permissions required for RAM accounts</a></li>
+                  
+              
+                  <li><a href="#deployment-process">Deployment process</a></li>
+                  
+                      <li class="li-h3"><a href="#deployment-steps">Deployment steps</a></li>
+                  
+              
+                  <li><a href="#use-the-tutorial">Use the tutorial</a></li>
+                  
+                      <li class="li-h3"><a href="#access-an-ecs-instance-through-vnc">Access an ECS instance through VNC</a></li>
+                  
+              
+          
+              <li><a href="#set-the-vnc-service-password-note-that-the-maximum-password-length-is-8-digits">Set the VNC service password. Note that the maximum password length is 8 digits</a></li>
+              
+          
+              <li><a href="#start-the-vnc-server-service-the-service-will-listen-5901-port-the-installation-group-has-been-preset-to-open">Start the VNC Server service, the service will listen 5901 port, the installation group has been preset to open</a></li>
+              
+                  <li><a href="#ecs-console-comes-with-native-vnc-login-method">Ecs console comes with native VNC login method</a></li>
+                  
+              
+                  <li><a href="#how-to-use-isaac-sim">How to use Isaac Sim</a></li>
+                  
+                      <li class="li-h3"><a href="#example-1-scene-synthesis-dataset-generation-without-gui">Example 1: Scene synthesis dataset generation without GUI</a></li>
+                  
+              
+                  <li><a href="#render-composition-config-specifies-the-configuration-file-path-where-headless-true-is-set-persistentisaacasset_rootdefault-specifies-the-3d-asset-storage-path">Render composition (-- config specifies the configuration file path, where headless = true is set; --/persistent/isaac/asset_root/default specifies the 3D asset storage path)</a></li>
+                  
+                      <li class="li-h3"><a href="#example-2-using-isaac-sim-as-a-gui">Example 2: Using Isaac Sim as a GUI</a></li>
+                  
+                      <li class="li-h3"><a href="#how-to-use-the-isaac-lab">How to use the Isaac Lab</a></li>
+                  
+              
+                  <li><a href="#render-composition-config-specifies-the-configuration-file-path-where-headless-true-is-set-persistentisaacasset_rootdefault-specifies-the-3d-asset-storage-path_1">Render composition (-- config specifies the configuration file path, where headless = true is set; --/persistent/isaac/asset_root/default specifies the 3D asset storage path)</a></li>
+                  
+                      <li class="li-h3"><a href="#example-2-generating-basic-objects-in-a-scene-using-gui-mode">Example 2: Generating Basic Objects in a Scene Using GUI Mode</a></li>
+                  
+              
+          
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="content theme-github">
+      
+      <div class="content-inner">        
+        
+        <h1 id="isaac-lab-standalone-deployment-documentation">Isaac Lab standalone deployment documentation</h1>
+<h2 id="overview">Overview</h2>
+<p>Built on top of Isaac Sim, Isaac Lab provides a unified and flexible learning framework for robotics using the latest simulation technology. It is designed to be modular and extensible, and aims to simplify common workflows in robotics research (such as reinforcement learning, demonstration learning, and motion planning). Although it includes some pre-built environments, sensors, and tasks, its main goal is to provide an open source, unified, and easy-to-use interface for developing and testing custom environments and robot learning algorithms.</p>
+<h2 id="billing-description">Billing Description</h2>
+<p>Issac Lab's expenses on computing nests mainly relate:</p>
+<p>-Selected vCPU, GPU, and memory specifications
+-System disk type and capacity
+-Public network bandwidth</p>
+<p>Billing methods include:</p>
+<p>-Pay-As-You-Go (hours)
+-Package year and package month</p>
+<p>The estimated cost can be seen in real time when the instance is created.</p>
+<h2 id="service-architecture">Service Architecture</h2>
+<p><img alt="img.png" src="images-en/img.png" /></p>
+<h2 id="permissions-required-for-ram-accounts">Permissions required for RAM accounts</h2>
+<p>The Isaac Lab service needs to access and create resources such as ECS and VPC. If you use a RAM user to create a service instance, you need to add the corresponding resource permissions to the account of the RAM user before creating the service instance. For details about how to add RAM permissions, see <a href="https://help.aliyun.com/document_detail/121945.html">Authorize RAM users</a>. The required permissions are shown in the following table.</p>
+<table>
+<thead>
+<tr>
+<th>Permission policy name</th>
+<th>Comment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AliyunECSFullAccess</td>
+<td>Permissions to manage ECS instances</td>
+</tr>
+<tr>
+<td>AliyunVPCFullAccess</td>
+<td>Permissions to manage a VPC</td>
+</tr>
+<tr>
+<td>AliyunROSFullAccess</td>
+<td>Manage permissions for Resource Orchestration Service (ROS)</td>
+</tr>
+<tr>
+<td>AliyunComputeNestUserFullAccess</td>
+<td>Manage user-side permissions for the compute nest service (ComputeNest)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="deployment-process">Deployment process</h2>
+<h3 id="deployment-steps">Deployment steps</h3>
+<h4 id="step-1-select-configuration">Step 1: Select Configuration</h4>
+<ol>
+<li>Select the service template, and select the stand-alone version here.</li>
+</ol>
+<p><img alt="img_32.png" src="images-en/img_32.png" />
+2. The name of the service instance can be customized or the default can be used.
+2. Region, it is recommended to select nearby to obtain better network delay
+3. Payment type, select Pay-As-You-Go or Package
+4. For the instance type, you need to select a GPU instance. It is officially recommended to use the ecs.gn6i-c40g1.10xlarge instance specification. For details, please refer to the Aliyun Deployment Document on the official website of Isaac sim <a href="https://docs.isaacsim.omniverse.nvidia.com/latest/installation/install_advanced_cloud_setup_alibaba.html">Alibaba Cloud Deployment</a></p>
+<p><img alt="img_1.png" src="images-en/img_1.png" />
+5. Instance password, which is used to set the password of the ECS instance.
+6. In the available zone configuration, you can select the corresponding available zone under the region, select the existing or new VPC network</p>
+<p><img alt="img_2.png" src="images-en/img_2.png" /></p>
+<h4 id="step-2-create-a-service-instance">Step 2: Create a Service Instance</h4>
+<ol>
+<li>After selecting the configuration required by the service, click Create Now to create a service instance.</li>
+</ol>
+<p><img alt="img_3.png" src="images-en/img_3.png" />
+2. After the service instance is created and initiated, the Service Instance List page is displayed, where you can view the deployment progress of the service instance.</p>
+<p><img alt="img_4.png" src="images-en/img_4.png" /></p>
+<h4 id="step-3-view-instance-details">Step 3: View Instance Details</h4>
+<ol>
+<li>When the service instance status changes to "Deployed", click the service instance name to enter the corresponding service instance details page.</li>
+</ol>
+<p><img alt="img_5.png" src="images-en/img_5.png" />
+2. Service Instance Details In the "Use Now" module, you can see the IP address of the server. For specific usage methods, see the service deployment and usage instructions above.</p>
+<p><img alt="img_6.png" src="images-en/img_6.png" /></p>
+<h2 id="use-the-tutorial">Use the tutorial</h2>
+<p>The Isaac Lab service instance has a complete built-in Isaac Sim application and supports two training modes: either independently using Isaac Sim for simulation training or intensive learning training based on the Isaac Lab framework.</p>
+<p>The corresponding ECS instance is installed with the Ubuntu graphical interface and can be used directly in the ECS console through VNC.</p>
+<h3 id="access-an-ecs-instance-through-vnc">Access an ECS instance through VNC</h3>
+<p>Currently, there are two ways to access Ubuntu instances. We recommend that you use VncServer VncRealViewer to access Ubuntu instances. You can easily adjust the resolution and use it more smoothly.</p>
+<h4 id="access-vncserver-vncrealviewer-recommended">Access VncServer VncRealViewer (recommended)</h4>
+<ol>
+<li>On the Service Instance Details page, find the corresponding ECS instance and click Remote Connection to log on.</li>
+</ol>
+<p><img alt="img_28.png" src="images-en/img_28.png" /></p>
+<ol>
+<li>Log on to the ECS instance and run the following command:
+shell
+Switch to the root account
+sudo su root</li>
+</ol>
+<h1 id="set-the-vnc-service-password-note-that-the-maximum-password-length-is-8-digits">Set the VNC service password. Note that the maximum password length is 8 digits</h1>
+<p>/opt/TurboVNC/bin/vncpasswd</p>
+<h1 id="start-the-vnc-server-service-the-service-will-listen-5901-port-the-installation-group-has-been-preset-to-open">Start the VNC Server service, the service will listen 5901 port, the installation group has been preset to open</h1>
+<p>/opt/TurboVNC/bin/vncserver :1 -geometry 1920x1080 -depth 24 -xstartup ~/.vnc/xstartup
+'''
+3. Download <a href="https://www.realvnc.com/en/connect/download/viewer/">VncRealViewer Client</a> and enter <Server Public Network IP>:5901 to connect to the server.</p>
+<p><img alt="img_29.png" src="images-en/img_29.png" /></p>
+<p><img alt="img_30.png" src="images-en/img_30.png" /></p>
+<ol>
+<li>In the/home/isaac-sim/isaacsim path, run the./isaac-sim.sh -- allow-root command to open the Isaac Sim interface.</li>
+</ol>
+<p><img alt="img_31.png" src="images-en/img_31.png" /></p>
+<h4 id="ecs-console-comes-with-native-vnc-login-method">Ecs console comes with native VNC login method</h4>
+<ol>
+<li>On the Service Instance Details page, find the corresponding ECS instance in Resources, and click Go to ECS Console.</li>
+</ol>
+<p><img alt="img_17.png" src="images-en/img_17.png" /></p>
+<ol>
+<li>Click the remote connection in the upper right corner and select the VNC login method to enter the graphical interface of the Ubuntu system.</li>
+</ol>
+<p><img alt="img_18.png" src="images-en/img_18.png" /></p>
+<ol>
+<li>Enter the logon password corresponding to the isaac-sim account. The password is the same as the ECS instance password. You can go to the service instance overview page to view the password.</li>
+</ol>
+<p><img alt="img_19.png" src="images-en/img_19.png" /></p>
+<h3 id="how-to-use-isaac-sim">How to use Isaac Sim</h3>
+<p>After logging on to the ECS instance in the above way, open the Terminal and you can see the isaacsim and isaacsim_assets directories under the isaac-sim account.
+-The isaacsim directory is the installation directory of Isaac Sim, which contains Isaac Sim-related startup and training scripts.
+-The isaacsim_assets directory is Isaac Sim's resource directory, which has been downloaded in advance for later training.</p>
+<p><img alt="img_21.png" src="images-en/img_21.png" /></p>
+<h4 id="example-1-scene-synthesis-dataset-generation-without-gui">Example 1: Scene synthesis dataset generation without GUI</h4>
+<p>This example demonstrates the process of generating a synthetic dataset using the omni.replicator extension. The resulting data will be stored offline (on disk), making it available for the training of the deep neural network. The examples can be run in Isaac Sim's Python standalone environment and use Isaac Sim and Replicator to create offline synthetic datasets for training ML models. It is recommended to copy the official sample code to the user directory for modification and use.
+shell
+cd /home/isaac-sim
+mkdir -p isaacsim_test
+cd /home/isaac-sim/isaacsim_test
+mkdir -p scene_based_sdg
+cp -rf /home/isaac-sim/isaacsim/standalone_examples/replicator/scene_based_sdg/* /home/isaac-sim/isaacsim_test/scene_based_sdg/</p>
+<h2 id="render-composition-config-specifies-the-configuration-file-path-where-headless-true-is-set-persistentisaacasset_rootdefault-specifies-the-3d-asset-storage-path">Render composition (-- config specifies the configuration file path, where headless = true is set; --/persistent/isaac/asset_root/default specifies the 3D asset storage path)</h2>
+<p>/home/isaac-sim/isaacsim/python.sh ./scene_based_sdg/scene_based_sdg.py --config="/home/isaac-sim/isaacsim_test/scene_based_sdg/config/config_coco_writer.yaml" --/persistent/isaac/asset_root/default="/home/isaac-sim/isaacsim_assets/Assets/Isaac/4.5"
+'''
+The build results are stored in "./isaacsim_test/_out_coco" and visualized as follows:
+<img alt="img_23.png" src="images-en/img_23.png" /><img alt="img_22.png" src="images-en/img_22.png" /></p>
+<h4 id="example-2-using-isaac-sim-as-a-gui">Example 2: Using Isaac Sim as a GUI</h4>
+<p>Execute the following command in the termial to enter the GUI interface of Isaac Sim.
+shell
+cd /home/isaac-sim/isaacsim
+./isaac-sim.sh
+'''
+It should be noted here that Isaac Sim will be slower to start, and a waiting window will pop up. There is no need to operate, just wait for a period of time.</p>
+<p><img alt="img_24.png" src="images-en/img_24.png" /></p>
+<p>The following are the steps in the <a href="https://docs.isaacsim.omniverse.nvidia.com/4.5.0/introduction/quickstart_isaacsim.html">Getting Started</a> to create a cube.</p>
+<p><img alt="img_25.png" src="images-en/img_25.png" /></p>
+<h3 id="how-to-use-the-isaac-lab">How to use the Isaac Lab</h3>
+<p>The Isaac Lab service installation directory is located in/home/isaac-sim/IsaacLab, which contains the installation directory and startup scripts for Isaac Lab.</p>
+<h4 id="example-1-train-the-intelligences-using-gui-free-mode">Example 1: Train the intelligences using GUI-free mode</h4>
+<p>In this case, we will use Stable-Baselines3 reinforcement learning (RL) framework to solve the agent task of Cartpole balance control. Stable-Baselines3 is a PyTorch-based reinforcement learning library that provides a variety of stable and easy-to-use RL algorithms, such as PPO, SAC, DQN, etc. The training goal is to let the intelligent body learn how to control the left and right movement of the car and keep the swing rod upright. We recommend that you copy the sample code to your personal directory for modification and debugging.
+shell
+cd /home/isaac-sim
+mkdir -p isaaclab_test
+cd /home/isaac-sim/isaaclab_test
+mkdir -p sb3
+cp -rf /home/isaac-sim/IsaacLab/scripts/reinforcement_learning/sb3/* /home/isaac-sim/isaaclab_test/sb3/</p>
+<h2 id="render-composition-config-specifies-the-configuration-file-path-where-headless-true-is-set-persistentisaacasset_rootdefault-specifies-the-3d-asset-storage-path_1">Render composition (-- config specifies the configuration file path, where headless = true is set; --/persistent/isaac/asset_root/default specifies the 3D asset storage path)</h2>
+<p>/home/isaac-sim/IsaacLab/isaaclab.sh -p ./sb3/train.py --task Isaac-Cartpole-v0 --num_envs 64 --headless --video
+'''
+The training results are saved to./logs/sb3/Isaac-Cartpole-v0; the visualization results are as follows
+<img alt="img_26.png" src="images-en/img_26.png" /></p>
+<h4 id="example-2-generating-basic-objects-in-a-scene-using-gui-mode">Example 2: Generating Basic Objects in a Scene Using GUI Mode</h4>
+<p>Run the following command in the Terminal to enter the GUI interface of Isaac Lab.
+shell
+cd /home/isaac-sim/IsaacLab
+./isaaclab.sh -p scripts/tutorials/00_sim/spawn_prims.py
+'''
+<img alt="img_27.png" src="images-en/img_27.png" /></p>
+        
+      </div>
+
+      <div class="copyrights">© 2009-2022 Aliyun.com 版权所有</div>
+    </div>
+  </div>
+  
+  <!--
+  MkDocs version      : 1.6.1
+  Docs Build Date UTC : 2026-04-10 07:57:25.239645+00:00
+  -->
+</body>
+</html>
